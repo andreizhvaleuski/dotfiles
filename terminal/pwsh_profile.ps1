@@ -1,4 +1,4 @@
-oh-my-posh init pwsh --config "themes\main.omp.json" | Invoke-Expression
+oh-my-posh init pwsh --config "themes/main.omp.json" | Invoke-Expression
 
 # PowerShell parameter completion shim for the winget CLI
 Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
