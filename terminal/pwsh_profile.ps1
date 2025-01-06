@@ -457,3 +457,31 @@ else {
         Write-Error "Failed to install zoxide. Error: $_"
     }
 }
+
+function Update-Profile {
+    try {
+        $oldProfile = $PROFILE
+        $newProfile = "$env:temp/Microsoft.PowerShell_profile_$([guid]::NewGuid().ToString()).ps1"
+
+        $url = "https://raw.githubusercontent.com/andreizhvaleuski/dotfiles/refs/heads/main/terminal/pwsh_profile.ps1"
+        Invoke-RestMethod $url -OutFile $newProfile
+
+        $oldProfileHash = Get-FileHash $oldProfile -Algorithm SHA512
+        $newProfileHash = Get-FileHash "$env:temp/Microsoft.PowerShell_profile.ps1" -Algorithm SHA512
+
+        if ($newProfileHash.Hash -ne $oldProfileHash.Hash) {
+
+            Copy-Item -Path $newProfile -Destination $oldProfile -Force
+            Write-Host "Profile has been updated. Please, restart your shell to reflect changes" -ForegroundColor Magenta
+        }
+        else {
+            Write-Host "Profile is up to date" -ForegroundColor Green
+        }
+    }
+    catch {
+        Write-Error "Unable to check for `$profile updates: $_"
+    }
+    finally {
+        Remove-Item $newProfile -ErrorAction SilentlyContinue
+    }
+}
