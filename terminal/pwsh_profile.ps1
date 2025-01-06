@@ -462,6 +462,11 @@ else {
     }
 }
 
+function Update-Everything {
+    Update-Profile
+    Update-OhMyPoshConfig
+}
+
 function Update-OhMyPoshConfig {
     try {
         Copy-FileFromRemoteIfDifferent -sourceFileUrl $OhMyPoshConfigUrl -destinationFile $OhMyPoshConfigFile
