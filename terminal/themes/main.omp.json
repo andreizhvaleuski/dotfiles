@@ -28,7 +28,7 @@
                     "type": "path",
                     "style": "plain",
                     "background": "transparent",
-                    "foreground": "blue",
+                    "foreground": "lightBlue",
                     "template": "{{ .Path }} ",
                     "properties": {
                         "style": "full"
