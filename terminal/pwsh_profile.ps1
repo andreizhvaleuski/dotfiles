@@ -490,11 +490,7 @@ function Copy-FileFromRemoteIfDifferent {
         $destinationFile
     )
 
-    if (-Not (Test-Path $destinationFile -PathType Leaf -ErrorAction Stop)) {
-        throw [System.IO.FileNotFoundException]::new('The file is not found', $destinationFile)
-    }
-
-    $sourceFile = "$env:temp/Microsoft.PowerShell_profile_$([guid]::NewGuid().ToString()).ps1"
+    $sourceFile = "$env:temp/$([guid]::NewGuid().ToString())"
 
     try {
         Invoke-RestMethod $sourceFileUrl -OutFile $sourceFile -ErrorAction Stop
@@ -520,7 +516,7 @@ function Copy-FileIfDifferent {
     }
 
     if (-Not (Test-Path $destinationFile -PathType Leaf -ErrorAction Stop)) {
-        throw [System.IO.FileNotFoundException]::new('The file is not found', $destinationFile)
+        New-Item -Path $destinationFile -ItemType 'file' -Force -ErrorAction Stop -InformationAction Ignore
     }
 
     $sourceFileHash = (Get-FileHash $sourceFile -Algorithm SHA512 -ErrorAction Stop).Hash
