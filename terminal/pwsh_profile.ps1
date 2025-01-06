@@ -469,9 +469,6 @@ function Update-OhMyPoshConfig {
     catch {
         Write-Error "Unable to check for Oh My Posh config updates: $_"
     }
-    finally {
-        Remove-Item $newProfile -ErrorAction SilentlyContinue
-    }
 }
 
 function Update-Profile {
@@ -480,9 +477,6 @@ function Update-Profile {
     }
     catch {
         Write-Error "Unable to check for PowerShell profile updates: $_"
-    }
-    finally {
-        Remove-Item $newProfile -ErrorAction SilentlyContinue
     }
 }
 
