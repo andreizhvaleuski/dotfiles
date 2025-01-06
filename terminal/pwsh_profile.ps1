@@ -467,7 +467,7 @@ function Update-Profile {
         Invoke-RestMethod $url -OutFile $newProfile
 
         $oldProfileHash = Get-FileHash $oldProfile -Algorithm SHA512
-        $newProfileHash = Get-FileHash "$env:temp/Microsoft.PowerShell_profile.ps1" -Algorithm SHA512
+        $newProfileHash = Get-FileHash $newProfile -Algorithm SHA512
 
         if ($newProfileHash.Hash -ne $oldProfileHash.Hash) {
             Copy-Item -Path $newProfile -Destination $oldProfile -Force
