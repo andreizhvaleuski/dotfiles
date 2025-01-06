@@ -1,3 +1,7 @@
+$PowerShellProfileUrl = 'https://raw.githubusercontent.com/andreizhvaleuski/dotfiles/refs/heads/main/terminal/pwsh_profile.ps1'
+$OhMyPoshConfigUrl = 'https://raw.githubusercontent.com/andreizhvaleuski/dotfiles/refs/heads/main/terminal/themes/main.omp.json'
+$OhMyPoshConfigFile = "$ENV:USERPROFILE/.config/oh-my-posh/main.omp.json"
+
 # Opt-out of telemetry before doing anything, only if PowerShell is run as admin
 if ([bool]([System.Security.Principal.WindowsIdentity]::GetCurrent()).IsSystem) {
     [System.Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', 'true', [System.EnvironmentVariableTarget]::Machine)
@@ -33,25 +37,25 @@ Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
 
 function Clear-Cache {
     # add clear cache logic here
-    Write-Host "Clearing cache..." -ForegroundColor Cyan
+    Write-Host 'Clearing cache...' -ForegroundColor Cyan
 
     # Clear Windows Prefetch
-    Write-Host "Clearing Windows Prefetch..." -ForegroundColor Yellow
+    Write-Host 'Clearing Windows Prefetch...' -ForegroundColor Yellow
     Remove-Item -Path "$env:SystemRoot\Prefetch\*" -Force -ErrorAction SilentlyContinue
 
     # Clear Windows Temp
-    Write-Host "Clearing Windows Temp..." -ForegroundColor Yellow
+    Write-Host 'Clearing Windows Temp...' -ForegroundColor Yellow
     Remove-Item -Path "$env:SystemRoot\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
 
     # Clear User Temp
-    Write-Host "Clearing User Temp..." -ForegroundColor Yellow
+    Write-Host 'Clearing User Temp...' -ForegroundColor Yellow
     Remove-Item -Path "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
 
     # Clear Internet Explorer Cache
-    Write-Host "Clearing Internet Explorer Cache..." -ForegroundColor Yellow
+    Write-Host 'Clearing Internet Explorer Cache...' -ForegroundColor Yellow
     Remove-Item -Path "$env:LOCALAPPDATA\Microsoft\Windows\INetCache\*" -Recurse -Force -ErrorAction SilentlyContinue
 
-    Write-Host "Cache clearing completed." -ForegroundColor Green
+    Write-Host 'Cache clearing completed.' -ForegroundColor Green
 }
 
 function uptime {
@@ -62,7 +66,7 @@ function uptime {
             $bootTime = [System.Management.ManagementDateTimeConverter]::ToDateTime($lastBoot)
         }
         else {
-            $lastBootStr = net statistics workstation | Select-String "since" | ForEach-Object { $_.ToString().Replace('Statistics since ', '') }
+            $lastBootStr = net statistics workstation | Select-String 'since' | ForEach-Object { $_.ToString().Replace('Statistics since ', '') }
             # check date format
             if ($lastBootStr -match '^\d{2}/\d{2}/\d{4}') {
                 $dateFormat = 'dd/MM/yyyy'
@@ -93,7 +97,7 @@ function uptime {
 
         # Format the start time
         ### $formattedBootTime = $bootTime.ToString("dddd, MMMM dd, yyyy HH:mm:ss", [System.Globalization.CultureInfo]::InvariantCulture)
-        $formattedBootTime = $bootTime.ToString("dddd, MMMM dd, yyyy HH:mm:ss", [System.Globalization.CultureInfo]::InvariantCulture) + " [$lastBootStr]"
+        $formattedBootTime = $bootTime.ToString('dddd, MMMM dd, yyyy HH:mm:ss', [System.Globalization.CultureInfo]::InvariantCulture) + " [$lastBootStr]"
         Write-Host "System started on: $formattedBootTime" -ForegroundColor DarkGray
 
         # calculate uptime
@@ -106,23 +110,23 @@ function uptime {
         $seconds = $uptime.Seconds
 
         # Uptime output
-        Write-Host ("Uptime: {0} days, {1} hours, {2} minutes, {3} seconds" -f $days, $hours, $minutes, $seconds) -ForegroundColor Blue
+        Write-Host ('Uptime: {0} days, {1} hours, {2} minutes, {3} seconds' -f $days, $hours, $minutes, $seconds) -ForegroundColor Blue
         
 
     }
     catch {
-        Write-Error "An error occurred while retrieving system uptime."
+        Write-Error 'An error occurred while retrieving system uptime.'
     }
 }
 
 # Navigation Shortcuts
 function docs { 
-    $docs = if (([Environment]::GetFolderPath("MyDocuments"))) { ([Environment]::GetFolderPath("MyDocuments")) } else { $HOME + "\Documents" }
+    $docs = if (([Environment]::GetFolderPath('MyDocuments'))) { ([Environment]::GetFolderPath('MyDocuments')) } else { $HOME + '\Documents' }
     Set-Location -Path $docs
 }
     
 function dtop { 
-    $dtop = if ([Environment]::GetFolderPath("Desktop")) { [Environment]::GetFolderPath("Desktop") } else { $HOME + "\Documents" }
+    $dtop = if ([Environment]::GetFolderPath('Desktop')) { [Environment]::GetFolderPath('Desktop') } else { $HOME + '\Documents' }
     Set-Location -Path $dtop
 }
 
@@ -164,17 +168,17 @@ function la { Get-ChildItem -Path . -Force | Format-Table -AutoSize }
 function ll { Get-ChildItem -Path . -Force -Hidden | Format-Table -AutoSize }
 
 function Open-Solution() {
-    $solutions = Get-ChildItem -path '*.sln'
+    $solutions = Get-ChildItem -Path '*.sln'
 
     if ($solutions.Count -eq 1) {
         & $solutions.FullName
     }
     elseif ($solutions.Count -eq 0) {
-        write-host "I couldn't find any solution files here!"
+        Write-Host "I couldn't find any solution files here!"
     }
     elseif ($solutions.Count -gt 1) {
-        write-host "I found more than solution. Which one do you want to open?"
-        $solutions | ForEach-Object { write-host " - $($_.FullName)" }
+        Write-Host 'I found more than solution. Which one do you want to open?'
+        $solutions | ForEach-Object { Write-Host " - $($_.FullName)" }
     }
 }
 
@@ -185,7 +189,7 @@ Set-Alias sln Open-Solution
 # Should be configured after PSReadLine
 #
 
-oh-my-posh init pwsh --config "$ENV:USERPROFILE\dotfiles\terminal\themes\main.omp.json" | Invoke-Expression
+oh-my-posh init pwsh --config $OhMyPoshConfigFile | Invoke-Expression
 
 function __oh-my-posh_debug {
     if ($env:BASH_COMP_DEBUG_FILE) {
@@ -208,8 +212,8 @@ filter __oh-my-posh_escapeStringWithSpecialChars {
     $Command = $CommandAst.CommandElements
     $Command = "$Command"
 
-    __oh-my-posh_debug ""
-    __oh-my-posh_debug "========= starting completion logic =========="
+    __oh-my-posh_debug ''
+    __oh-my-posh_debug '========= starting completion logic =========='
     __oh-my-posh_debug "WordToComplete: $WordToComplete Command: $Command CursorPosition: $CursorPosition"
 
     # The user could have moved the cursor backwards on the command-line.
@@ -231,7 +235,7 @@ filter __oh-my-posh_escapeStringWithSpecialChars {
 
     # Prepare the command to request completions for the program.
     # Split the command at the first space to separate the program and arguments.
-    $Program, $Arguments = $Command.Split(" ", 2)
+    $Program, $Arguments = $Command.Split(' ', 2)
 
     $RequestComp = "$Program __complete $Arguments"
     __oh-my-posh_debug "RequestComp: $RequestComp"
@@ -239,30 +243,30 @@ filter __oh-my-posh_escapeStringWithSpecialChars {
     # we cannot use $WordToComplete because it
     # has the wrong values if the cursor was moved
     # so use the last argument
-    if ($WordToComplete -ne "" ) {
-        $WordToComplete = $Arguments.Split(" ")[-1]
+    if ($WordToComplete -ne '' ) {
+        $WordToComplete = $Arguments.Split(' ')[-1]
     }
     __oh-my-posh_debug "New WordToComplete: $WordToComplete"
 
 
     # Check for flag with equal sign
-    $IsEqualFlag = ($WordToComplete -Like "--*=*" )
+    $IsEqualFlag = ($WordToComplete -Like '--*=*' )
     if ( $IsEqualFlag ) {
-        __oh-my-posh_debug "Completing equal sign flag"
+        __oh-my-posh_debug 'Completing equal sign flag'
         # Remove the flag part
-        $Flag, $WordToComplete = $WordToComplete.Split("=", 2)
+        $Flag, $WordToComplete = $WordToComplete.Split('=', 2)
     }
 
-    if ( $WordToComplete -eq "" -And ( -Not $IsEqualFlag )) {
+    if ( $WordToComplete -eq '' -And ( -Not $IsEqualFlag )) {
         # If the last parameter is complete (there is a space following it)
         # We add an extra empty parameter so we can indicate this to the go method.
-        __oh-my-posh_debug "Adding extra empty parameter"
+        __oh-my-posh_debug 'Adding extra empty parameter'
         # PowerShell 7.2+ changed the way how the arguments are passed to executables,
         # so for pre-7.2 or when Legacy argument passing is enabled we need to use
         # `"`" to pass an empty argument, a "" or '' does not work!!!
         if ($PSVersionTable.PsVersion -lt [version]'7.2.0' -or
-            ($PSVersionTable.PsVersion -lt [version]'7.3.0' -and -not [ExperimentalFeature]::IsEnabled("PSNativeCommandArgumentPassing")) -or
-            (($PSVersionTable.PsVersion -ge [version]'7.3.0' -or [ExperimentalFeature]::IsEnabled("PSNativeCommandArgumentPassing")) -and
+            ($PSVersionTable.PsVersion -lt [version]'7.3.0' -and -not [ExperimentalFeature]::IsEnabled('PSNativeCommandArgumentPassing')) -or
+            (($PSVersionTable.PsVersion -ge [version]'7.3.0' -or [ExperimentalFeature]::IsEnabled('PSNativeCommandArgumentPassing')) -and
             $PSNativeCommandArgumentPassing -eq 'Legacy')) {
             $RequestComp = "$RequestComp" + ' `"`"'
         }
@@ -281,7 +285,7 @@ filter __oh-my-posh_escapeStringWithSpecialChars {
 
     # get directive from last line
     [int]$Directive = $Out[-1].TrimStart(':')
-    if ($Directive -eq "") {
+    if ($Directive -eq '') {
         # There is no directive specified
         $Directive = 0
     }
@@ -293,7 +297,7 @@ filter __oh-my-posh_escapeStringWithSpecialChars {
 
     if (($Directive -band $ShellCompDirectiveError) -ne 0 ) {
         # Error code.  No completion.
-        __oh-my-posh_debug "Received error from custom completion go code"
+        __oh-my-posh_debug 'Received error from custom completion go code'
         return
     }
 
@@ -311,22 +315,22 @@ filter __oh-my-posh_escapeStringWithSpecialChars {
         # Set the description to a one space string if there is none set.
         # This is needed because the CompletionResult does not accept an empty string as argument
         if (-Not $Description) {
-            $Description = " "
+            $Description = ' '
         }
         @{Name = "$Name"; Description = "$Description" }
     }
 
 
-    $Space = " "
+    $Space = ' '
     if (($Directive -band $ShellCompDirectiveNoSpace) -ne 0 ) {
         # remove the space here
-        __oh-my-posh_debug "ShellCompDirectiveNoSpace is called"
-        $Space = ""
+        __oh-my-posh_debug 'ShellCompDirectiveNoSpace is called'
+        $Space = ''
     }
 
     if ((($Directive -band $ShellCompDirectiveFilterFileExt) -ne 0 ) -or
        (($Directive -band $ShellCompDirectiveFilterDirs) -ne 0 )) {
-        __oh-my-posh_debug "ShellCompDirectiveFilterFileExt ShellCompDirectiveFilterDirs are not supported"
+        __oh-my-posh_debug 'ShellCompDirectiveFilterFileExt ShellCompDirectiveFilterDirs are not supported'
 
         # return here to prevent the completion of the extensions
         return
@@ -338,8 +342,8 @@ filter __oh-my-posh_escapeStringWithSpecialChars {
 
         # Join the flag back if we have an equal sign flag
         if ( $IsEqualFlag ) {
-            __oh-my-posh_debug "Join the equal sign flag back to the completion value"
-            $_.Name = $Flag + "=" + $_.Name
+            __oh-my-posh_debug 'Join the equal sign flag back to the completion value'
+            $_.Name = $Flag + '=' + $_.Name
         }
     }
 
@@ -349,20 +353,20 @@ filter __oh-my-posh_escapeStringWithSpecialChars {
     }
 
     if (($Directive -band $ShellCompDirectiveNoFileComp) -ne 0 ) {
-        __oh-my-posh_debug "ShellCompDirectiveNoFileComp is called"
+        __oh-my-posh_debug 'ShellCompDirectiveNoFileComp is called'
 
         if ($Values.Length -eq 0) {
             # Just print an empty string here so the
             # shell does not start to complete paths.
             # We cannot use CompletionResult here because
             # it does not accept an empty string as argument.
-            ""
+            ''
             return
         }
     }
 
     # Get the current mode
-    $Mode = (Get-PSReadLineKeyHandler | Where-Object { $_.Key -eq "Tab" }).Function
+    $Mode = (Get-PSReadLineKeyHandler | Where-Object { $_.Key -eq 'Tab' }).Function
     __oh-my-posh_debug "Mode: $Mode"
 
     $Values | ForEach-Object {
@@ -385,10 +389,10 @@ filter __oh-my-posh_escapeStringWithSpecialChars {
         switch ($Mode) {
 
             # bash like
-            "Complete" {
+            'Complete' {
 
                 if ($Values.Length -eq 1) {
-                    __oh-my-posh_debug "Only one completion left"
+                    __oh-my-posh_debug 'Only one completion left'
 
                     # insert space after value
                     [System.Management.Automation.CompletionResult]::new($($comp.Name | __oh-my-posh_escapeStringWithSpecialChars) + $Space, "$($comp.Name)", 'ParameterValue', "$($comp.Description)")
@@ -397,12 +401,12 @@ filter __oh-my-posh_escapeStringWithSpecialChars {
                 else {
                     # Add the proper number of spaces to align the descriptions
                     while ($comp.Name.Length -lt $Longest) {
-                        $comp.Name = $comp.Name + " "
+                        $comp.Name = $comp.Name + ' '
                     }
 
                     # Check for empty description and only add parentheses if needed
-                    if ($($comp.Description) -eq " " ) {
-                        $Description = ""
+                    if ($($comp.Description) -eq ' ' ) {
+                        $Description = ''
                     }
                     else {
                         $Description = "  ($($comp.Description))"
@@ -413,7 +417,7 @@ filter __oh-my-posh_escapeStringWithSpecialChars {
             }
 
             # zsh like
-            "MenuComplete" {
+            'MenuComplete' {
                 # insert space after value
                 # MenuComplete will automatically show the ToolTip of
                 # the highlighted value at the bottom of the suggestions.
@@ -447,10 +451,10 @@ if (Get-Command zoxide -ErrorAction SilentlyContinue) {
     InitZoxide
 }
 else {
-    Write-Host "zoxide command not found. Attempting to install via winget..."
+    Write-Host 'zoxide command not found. Attempting to install via winget...'
     try {
         winget install -e --id ajeetdsouza.zoxide
-        Write-Host "zoxide installed successfully. Initializing..."
+        Write-Host 'zoxide installed successfully. Initializing...'
         InitZoxide
     }
     catch {
@@ -458,29 +462,84 @@ else {
     }
 }
 
-function Update-Profile {
+function Update-OhMyPoshConfig {
     try {
-        $oldProfile = $PROFILE
-        $newProfile = "$env:temp/Microsoft.PowerShell_profile_$([guid]::NewGuid().ToString()).ps1"
-
-        $url = "https://raw.githubusercontent.com/andreizhvaleuski/dotfiles/refs/heads/main/terminal/pwsh_profile.ps1"
-        Invoke-RestMethod $url -OutFile $newProfile
-
-        $oldProfileHash = Get-FileHash $oldProfile -Algorithm SHA512
-        $newProfileHash = Get-FileHash $newProfile -Algorithm SHA512
-
-        if ($newProfileHash.Hash -ne $oldProfileHash.Hash) {
-            Copy-Item -Path $newProfile -Destination $oldProfile -Force
-            Write-Host "Profile has been updated. Please, restart your shell to reflect changes" -ForegroundColor Magenta
-        }
-        else {
-            Write-Host "Profile is up to date" -ForegroundColor Green
-        }
+        Copy-FileFromRemoteIfDifferent -sourceFileUrl $OhMyPoshConfigUrl -destinationFile $OhMyPoshConfigFile
     }
     catch {
-        Write-Error "Unable to check for `$profile updates: $_"
+        Write-Error "Unable to check for Oh My Posh config updates: $_"
     }
     finally {
         Remove-Item $newProfile -ErrorAction SilentlyContinue
+    }
+}
+
+function Update-Profile {
+    try {
+        Copy-FileFromRemoteIfDifferent -sourceFileUrl $PowerShellProfileUrl -destinationFile $PROFILE
+    }
+    catch {
+        Write-Error "Unable to check for PowerShell profile updates: $_"
+    }
+    finally {
+        Remove-Item $newProfile -ErrorAction SilentlyContinue
+    }
+}
+
+function Copy-FileFromRemoteIfDifferent {
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $sourceFileUrl,
+        [Parameter(Mandatory)]
+        [string]
+        $destinationFile
+    )
+
+    if (Test-Path $destinationFile -PathType Leaf -ErrorAction Stop) {
+        throw [System.IO.FileNotFoundException]::new('The file is not found', $destinationFile)
+    }
+
+    $sourceFile = "$env:temp/Microsoft.PowerShell_profile_$([guid]::NewGuid().ToString()).ps1"
+
+    try {
+        Invoke-RestMethod $sourceFileUrl -OutFile $sourceFile -ErrorAction Stop
+        Copy-FileIfDifferent -sourceFile $sourceFile -destinationFile $destinationFile
+    }
+    finally {
+        Remove-Item $sourceFile -ErrorAction SilentlyContinue
+    }
+}
+
+function Copy-FileIfDifferent {
+    param(
+        [Parameter(Mandatory)]
+        [string]
+        $sourceFile,
+        [Parameter(Mandatory)]
+        [string]
+        $destinationFile
+    )
+
+    if (Test-Path $sourceFile -PathType Leaf -ErrorAction Stop) {
+        throw [System.IO.FileNotFoundException]::new('The file is not found', $sourceFile)
+    }
+
+    if (Test-Path $destinationFile -PathType Leaf -ErrorAction Stop) {
+        throw [System.IO.FileNotFoundException]::new('The file is not found', $destinationFile)
+    }
+
+    $sourceFileHash = (Get-FileHash $sourceFile -Algorithm SHA512 -ErrorAction Stop).Hash
+    Write-Debug "Source file hash: $sourceFileHash"
+
+    $destinationFileHash = (Get-FileHash $destinationFile -Algorithm SHA512 -ErrorAction Stop).Hash
+    Write-Debug "Destination file hash: $destinationFileHash"
+
+    if ($sourceFileHash -ne $destinationFileHash) {
+        Copy-Item -Path $sourceFile -Destination $destinationFile -Force
+        Write-Verbose 'File has been copied'
+    }
+    else {
+        Write-Verbose 'Files are the same'
     }
 }
