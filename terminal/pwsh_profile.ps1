@@ -470,7 +470,6 @@ function Update-Profile {
         $newProfileHash = Get-FileHash "$env:temp/Microsoft.PowerShell_profile.ps1" -Algorithm SHA512
 
         if ($newProfileHash.Hash -ne $oldProfileHash.Hash) {
-
             Copy-Item -Path $newProfile -Destination $oldProfile -Force
             Write-Host "Profile has been updated. Please, restart your shell to reflect changes" -ForegroundColor Magenta
         }
