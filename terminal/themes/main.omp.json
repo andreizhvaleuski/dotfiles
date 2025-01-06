@@ -14,6 +14,20 @@
                     "type": "path",
                     "style": "plain",
                     "background": "transparent",
+                    "foreground": "lightBlue",
+                    "template": "{{ .UserName }}"
+                },
+                {
+                    "type": "path",
+                    "style": "plain",
+                    "background": "transparent",
+                    "foreground": "darkGray",
+                    "template": " @ "
+                },
+                {
+                    "type": "path",
+                    "style": "plain",
+                    "background": "transparent",
                     "foreground": "blue",
                     "template": "{{ .Path }} ",
                     "properties": {
@@ -22,8 +36,8 @@
                 },
                 {
                     "type": "git",
-                    "style": "powerline",
-                    "template": "{{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed) }} *{{ end }} <cyan>{{ if gt .Behind 0 }}⇣{{ end }}{{ if gt .Ahead 0 }}⇡{{ end }}</>",
+                    "style": "plain",
+                    "template": "{{ .HEAD }}{{ if or (.Working.Changed) (.Staging.Changed) }} <darkGray>*</>{{ end }}<cyan>{{ if gt .Behind 0 }} ⇣{{ end }}{{ if gt .Ahead 0 }} ⇡{{ end }}</>",
                     "properties": {
                         "branch_icon": "",
                         "commit_icon": "@",
