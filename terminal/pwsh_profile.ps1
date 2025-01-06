@@ -490,7 +490,7 @@ function Copy-FileFromRemoteIfDifferent {
         $destinationFile
     )
 
-    if (!Test-Path $destinationFile -PathType Leaf -ErrorAction Stop) {
+    if (-Not (Test-Path $destinationFile -PathType Leaf -ErrorAction Stop)) {
         throw [System.IO.FileNotFoundException]::new('The file is not found', $destinationFile)
     }
 
@@ -515,11 +515,11 @@ function Copy-FileIfDifferent {
         $destinationFile
     )
 
-    if (!Test-Path $sourceFile -PathType Leaf -ErrorAction Stop) {
+    if (-Not (Test-Path $sourceFile -PathType Leaf -ErrorAction Stop)) {
         throw [System.IO.FileNotFoundException]::new('The file is not found', $sourceFile)
     }
 
-    if (!Test-Path $destinationFile -PathType Leaf -ErrorAction Stop) {
+    if (-Not (Test-Path $destinationFile -PathType Leaf -ErrorAction Stop)) {
         throw [System.IO.FileNotFoundException]::new('The file is not found', $destinationFile)
     }
 
