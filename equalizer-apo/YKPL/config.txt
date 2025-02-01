@@ -1,0 +1,2 @@
+Device: Microphone Fifine Microphone {ee632121-a663-469d-99aa-384de9f1df6f}
+Include: fifine_a6v.txt
