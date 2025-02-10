@@ -538,3 +538,21 @@ function Copy-FileIfDifferent {
         Write-Verbose 'Files are the same'
     }
 }
+
+function Clean-DotNetBinaries {
+    $CurrentPath = (Get-Location -PSProvider FileSystem).ProviderPath
+
+    # recursively get all folders matching given includes, except ignored folders
+    $FoldersToRemove = Get-ChildItem . -Include '.vs', bin, obj -Recurse -Force | ForEach-Object { $_.fullname }
+
+    # remove folders and print to output
+    if ($null -ne $FoldersToRemove) {
+        foreach ($item in $FoldersToRemove) { 
+            Remove-Item $item -Force -Recurse
+            Write-Host 'Removed: .' -NoNewline 
+            Write-Host $item.replace($CurrentPath, '') 
+        }
+
+        Write-Host $FoldersToRemove.count 'folders removed' -ForegroundColor green
+    }
+}
