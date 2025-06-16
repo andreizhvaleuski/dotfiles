@@ -2,38 +2,7 @@ $PowerShellProfileUrl = 'https://raw.githubusercontent.com/andreizhvaleuski/dotf
 $OhMyPoshConfigUrl = 'https://raw.githubusercontent.com/andreizhvaleuski/dotfiles/refs/heads/main/terminal/themes/main.omp.json'
 $OhMyPoshConfigFile = "$ENV:USERPROFILE/.config/oh-my-posh/main.omp.json"
 
-# Opt-out of telemetry before doing anything, only if PowerShell is run as admin
-if ([bool]([System.Security.Principal.WindowsIdentity]::GetCurrent()).IsSystem) {
-    [System.Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', 'true', [System.EnvironmentVariableTarget]::Machine)
-}
-
-# Import Modules and External Profiles
-
-# Ensure Terminal-Icons module is installed before importing
-if (-not (Get-Module -ListAvailable -Name Terminal-Icons)) {
-    Install-Module -Name Terminal-Icons -Scope CurrentUser -Force -SkipPublisherCheck
-}
-
-Import-Module -Name Terminal-Icons
-
-# PowerShell parameter completion shim for the winget CLI
-Register-ArgumentCompleter -Native -CommandName winget -ScriptBlock {
-    param($wordToComplete, $commandAst, $cursorPosition)
-    [Console]::InputEncoding = [Console]::OutputEncoding = $OutputEncoding = [System.Text.Utf8Encoding]::new()
-    $Local:word = $wordToComplete.Replace('"', '""')
-    $Local:ast = $commandAst.ToString().Replace('"', '""')
-    winget complete --word="$Local:word" --commandline "$Local:ast" --position $cursorPosition | ForEach-Object {
-        [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
-    }
-}
-
-# PowerShell parameter completion shim for the dotnet CLI
-Register-ArgumentCompleter -Native -CommandName dotnet -ScriptBlock {
-    param($wordToComplete, $commandAst, $cursorPosition)
-    dotnet complete --position $cursorPosition "$commandAst" | ForEach-Object {
-        [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
-    }
-}
+& "$PSScriptRoot\Profile\ArugmentCompleters.ps1"
 
 function Clear-Cache {
     # add clear cache logic here
@@ -111,8 +80,6 @@ function uptime {
 
         # Uptime output
         Write-Host ('Uptime: {0} days, {1} hours, {2} minutes, {3} seconds' -f $days, $hours, $minutes, $seconds) -ForegroundColor Blue
-        
-
     }
     catch {
         Write-Error 'An error occurred while retrieving system uptime.'
@@ -164,11 +131,11 @@ Set-PSReadLineOption -PredictionSource HistoryAndPlugin
 Set-PSReadLineOption -MaximumHistoryCount 10000
 
 # Enhanced Listing
-function la { Get-ChildItem -Path . -Force | Format-Table -AutoSize }
-function ll { Get-ChildItem -Path . -Force -Hidden | Format-Table -AutoSize }
+function la { Get-ChildItem | Format-Table -AutoSize }
+function ll { Get-ChildItem -Force | Format-Table -AutoSize }
 
 function Open-Solution() {
-    $solutions = Get-ChildItem -Path '*.sln'
+    $solutions = Get-ChildItem -Path '*.slnx', '*.sln'
 
     if ($solutions.Count -eq 1) {
         & $solutions.FullName
@@ -444,7 +411,7 @@ Register-ArgumentCompleter -CommandName 'oh-my-posh' -ScriptBlock ${__oh_my_posh
 #
 
 function InitZoxide() {
-    Invoke-Expression (& { (zoxide init powershell | Out-String) })
+    Invoke-Expression (& { (zoxide init powershell --cmd cd | Out-String) })
 }
 
 if (Get-Command zoxide -ErrorAction SilentlyContinue) {
@@ -461,7 +428,7 @@ else {
         Write-Error "Failed to install zoxide. Error: $_"
     }
 }
-
+fzxf
 function Update-Everything {
     Update-Profile
     Update-OhMyPoshConfig
@@ -539,7 +506,7 @@ function Copy-FileIfDifferent {
     }
 }
 
-function Clean-DotNetBinaries {
+function Remove-DotNetBinaries {
     $CurrentPath = (Get-Location -PSProvider FileSystem).ProviderPath
 
     # recursively get all folders matching given includes, except ignored folders
