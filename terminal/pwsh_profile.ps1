@@ -428,7 +428,7 @@ else {
         Write-Error "Failed to install zoxide. Error: $_"
     }
 }
-fzxf
+
 function Update-Everything {
     Update-Profile
     Update-OhMyPoshConfig
